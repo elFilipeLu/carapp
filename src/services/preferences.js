@@ -19,6 +19,13 @@ function normalizeSeries(list) {
   return unique(list.map((x) => {
     const normalized = String(x).toUpperCase().replace(/\s+/g, "");
     if (normalized === "LEMANS" || normalized === "LE_MANS") return "LEMANS";
+    if (normalized === "FE" || normalized === "FORMULAE") {
+      return "FORMULAE";
+    }
+    if (normalized === "INDY" || normalized === "INDYCAR") return "INDYCAR";
+    if (normalized === "NASCARCUP" || normalized === "NASCARCUPSERIES") return "NASCAR";
+    if (normalized === "MOTOGP") return "MOTOGP";
+    if (normalized === "WORLDRALLYCHAMPIONSHIP") return "WRC";
     return normalized;
   }));
 }
@@ -54,6 +61,13 @@ const PRESETS = {
   },
   endurance: {
     series: ["WEC", "IMSA", "GT3", "LEMANS"],
+    sessions: ["race", "qualifying"],
+    favorites: [],
+    displayMode: "balanced",
+    rotateSeries: true,
+  },
+  global_fan: {
+    series: ["F1", "F2", "F3", "FORMULAE", "INDYCAR", "WEC", "IMSA", "GT3", "MOTOGP", "WRC", "NASCAR"],
     sessions: ["race", "qualifying"],
     favorites: [],
     displayMode: "balanced",

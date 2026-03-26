@@ -10,7 +10,7 @@ Backend API scaffold for a "top-tier fan edition" LaMetric motorsport app.
 - User personalization via query params (`series`, `sessions`, `favorites`, `tz`)
 - Persistent preference profiles (`GET/PUT /preferences/:profileId` + `?profile=...`)
 - Display modes: `auto`, `ultra`, `balanced`, `detailed`
-- LaMetric-ready frame payload generation (max 3 frames)
+- LaMetric-ready frame payload generation (up to 24 frames for multi-series deck)
 - In-memory cache (TTL 60s) and failover response
 - Real provider pipeline:
   - OpenF1 (primary for F1 sessions + recent pole/winner enrichment)
@@ -52,17 +52,21 @@ docker run --env-file .env -p 3000:3000 lametric-motorsport-api
 1. Push this repo to GitHub.
 2. In Render, create a Blueprint deployment from `render.yaml`.
 3. Set secrets/envs in Render dashboard:
-   - `API_TOKEN` (recommended)
+   - `API_TOKEN` (admin/API endpoints)
+   - `POLL_TOKEN` (recommended for `/lametric/poll`)
    - `REDIS_URL` (recommended for production)
 4. Deploy and verify:
    - `https://<your-domain>/health`
-   - `https://<your-domain>/lametric/poll?profile=<profile-id>&token=<API_TOKEN>`
+   - `https://<your-domain>/lametric/poll?profile=<profile-id>&token=<POLL_TOKEN>`
 
 ## Security and limits
 
-- `API_TOKEN` optional bearer token. If set:
+- `API_TOKEN` optional bearer token for admin/API routes. If set:
   - use `Authorization: Bearer <token>`
   - or query `?token=<token>`
+- `POLL_TOKEN` optional dedicated token for `GET /lametric/poll`:
+  - when set, `/lametric/poll` expects `?token=<POLL_TOKEN>`
+  - this lets you avoid exposing `API_TOKEN` in LaMetric poll URLs
 - `RATE_LIMIT_WINDOW_MS` (default `60000`)
 - `RATE_LIMIT_MAX_REQUESTS` (default `120`)
 - `REDIS_URL` optional (enables Redis-backed rate limit, prefs cache, notification dedup/recent)
@@ -84,6 +88,13 @@ docker run --env-file .env -p 3000:3000 lametric-motorsport-api
   - `IMSA`
   - `GT3` (GT World Challenge Europe)
   - `LEMANS` (Le Mans-only filter from WEC calendar)
+  - `MOTOGP`
+  - `WRC`
+  - `FORMULAE`
+  - `INDYCAR`
+  - `NASCAR`
+  - `F2`
+  - `F3`
 - `ICAL_FEEDS` JSON array to override/add feeds:
 
 ```json
@@ -113,7 +124,7 @@ If `REDIS_URL` is set and reachable, runtime state uses Redis. If Redis is unava
 - `GET /health`
 - `GET /lametric`
 - `GET /lametric/poll` (strict LaMetric poll contract)
-- `GET /providers/status`
+- `GET /providers/status` also reports `active_series` (series currently returning data)
 - `GET /metrics`
 - `GET /analytics/summary`
 - `GET /preferences/:profileId`
@@ -150,6 +161,15 @@ LaMetric poll payload endpoint:
 curl "http://localhost:3000/lametric/poll?profile=fan1"
 ```
 
+Multi-series profile deck behavior:
+
+- if multiple championships are selected and `rotateSeries=true`, output is grouped per championship:
+  - Frame 1: series
+  - Frame 2: session type
+  - Frame 3: local start time
+  - Frame 4: event name
+- only the next event per selected championship is displayed
+
 Display mode override example:
 
 ```bash
@@ -169,8 +189,17 @@ curl "http://localhost:3000/lametric/poll?profile=fan1&showSeriesLogo=true&showS
 - Visual design blueprint: `lametric/visual-design-spec.md`
 - In LaMetric Developer portal, create an `Indicator` + `Poll` app.
 - Set poll URL to your public HTTPS deployment:
-  - `https://<your-domain>/lametric/poll?profile=<profile-id>`
-- If you set `API_TOKEN`, include `&token=<API_TOKEN>` in the poll URL.
+  - `https://<your-domain>/lametric/poll`
+- Add app options so user can choose content without hardcoded URL values:
+  - Option ID `profile` (text): examples `fan1`, `f1_only`, `endurance`
+  - Option ID `series` (text): examples `F1,WEC` or `WEC,IMSA,GT3`
+  - Option ID `sessions` (text): examples `race,qualifying`
+  - Option ID `favorites` (text): example `VER,LEC`
+  - Option ID `tz` (text): example `Europe/Paris`
+  - Option ID `displayMode` (text): `auto|ultra|balanced|detailed`
+  - Option ID `rotateSeries` (text): `true|false`
+- If you set `POLL_TOKEN`, append it in URL:
+  - `https://<your-domain>/lametric/poll?token=<POLL_TOKEN>`
 
 ## Suggested next implementation steps
 

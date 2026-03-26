@@ -8,7 +8,7 @@ const {
 const { fetchRawEvents, getProviderStatus } = require("./providers");
 const { aggregateEvents } = require("./services/aggregation");
 const { prioritize } = require("./services/prioritization");
-const { formatFrames } = require("./services/lametricFormatter");
+const { formatFrames, formatProfileSeriesDeck } = require("./services/lametricFormatter");
 const {
   parsePreferences,
   applyFilters,
@@ -162,12 +162,19 @@ async function buildLametricState(query) {
   let resolvedFrames = payload.frames;
 
   const multiSeriesSelected = prefs.series.length > 1;
-  if (prefs.rotateSeries && multiSeriesSelected && selectedEvents.length > 1) {
-    const rotationFrames = selectedEvents
-      .map((event) => formatFrames(event, { ...prefsEffective, displayMode: "ultra" }, { dataAgeSec, isStale }).frames[0])
-      .filter(Boolean)
-      .slice(0, 3);
-    if (rotationFrames.length > 0) resolvedFrames = rotationFrames;
+  if (prefs.rotateSeries && multiSeriesSelected) {
+    const nextPerSeries = prefs.series
+      .map((series) => {
+        const scoped = filtered.filter((event) => event.series === series);
+        if (scoped.length === 0) return null;
+        const scopedPrioritized = prioritize(scoped);
+        return scopedPrioritized[0] || null;
+      })
+      .filter(Boolean);
+
+    if (nextPerSeries.length > 0) {
+      resolvedFrames = formatProfileSeriesDeck(nextPerSeries, prefsEffective).frames;
+    }
   }
 
   return {

@@ -8,6 +8,13 @@ function toSeriesIcon(series) {
     GT3: "i34230",
     IMSA: "i34230",
     LEMANS: "i34230",
+    MOTOGP: "i43696",
+    WRC: "i43695",
+    FORMULAE: "i41186",
+    INDYCAR: "i34230",
+    NASCAR: "i34230",
+    F2: "i41186",
+    F3: "i41186",
     LIVE: "i25731",
     WARN: "i43558",
   };
@@ -40,6 +47,7 @@ function shortName(full) {
 
 function seriesLabel(series) {
   if (series === "LEMANS") return "LM24";
+  if (series === "FORMULAE") return "FE";
   return series;
 }
 
@@ -169,6 +177,44 @@ function formatFrames(event, prefs, context = {}) {
   return { frames: frames.slice(0, mode === "ultra" ? 2 : 3) };
 }
 
+function fullSessionLabel(sessionType) {
+  const map = {
+    race: "RACE",
+    qualifying: "QUALI",
+    practice: "PRACTICE",
+  };
+  return map[sessionType] || "SESSION";
+}
+
+function eventShortLabel(eventName = "") {
+  const raw = String(eventName).trim();
+  if (!raw) return "NEXT EVENT";
+  const normalized = raw
+    .replace(/GRAND PRIX/gi, "GP")
+    .replace(/FIA WEC\s*\|/gi, "")
+    .replace(/\s+/g, " ")
+    .trim()
+    .toUpperCase();
+  return normalized.slice(0, 16);
+}
+
+function formatProfileSeriesDeck(events, prefs) {
+  const frames = [];
+  for (const event of events) {
+    const icon = resolvePrimaryIcon(event, prefs);
+    const localStart = DateTime.fromISO(event.start_time_utc, { zone: "utc" })
+      .setZone(prefs.tz)
+      .toFormat("HH:mm");
+
+    frames.push({ text: seriesLabel(event.series), icon });
+    frames.push({ text: fullSessionLabel(event.session_type), icon });
+    frames.push({ text: localStart, icon });
+    frames.push({ text: eventShortLabel(event.event_name), icon });
+  }
+  return { frames };
+}
+
 module.exports = {
   formatFrames,
+  formatProfileSeriesDeck,
 };

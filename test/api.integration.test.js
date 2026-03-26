@@ -88,7 +88,7 @@ test("analytics summary returns mode and frame stats", async (t) => {
   assert.equal(Array.isArray(analytics.top_frames), true);
 });
 
-test("multi-series rotation returns one frame per selected series", async (t) => {
+test("multi-series rotation returns a 4-frame deck per selected series", async (t) => {
   const { server, baseUrl } = await startServer();
   t.after(() => server.close());
 
@@ -98,8 +98,8 @@ test("multi-series rotation returns one frame per selected series", async (t) =>
   assert.equal(response.status, 200);
   const payload = await response.json();
   assert.equal(Array.isArray(payload.frames), true);
-  assert.equal(payload.frames.length >= 1, true);
-  assert.equal(payload.frames.length <= 3, true);
+  assert.equal(payload.frames.length >= 4, true);
+  assert.equal(payload.frames.length <= 24, true);
 });
 
 test("preset and alias parameters work for embedded lametric-only config", async (t) => {

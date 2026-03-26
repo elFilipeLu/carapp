@@ -1,4 +1,4 @@
-const MAX_FRAMES = 3;
+const MAX_FRAMES = 24;
 const MAX_TEXT_LENGTH = 16;
 const DEFAULT_ICON = "i43558";
 

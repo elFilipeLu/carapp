@@ -2,7 +2,7 @@ const test = require("node:test");
 const assert = require("node:assert/strict");
 const { makePollPayload } = require("../src/services/lametricContract");
 
-test("makePollPayload enforces 1-3 normalized frames", () => {
+test("makePollPayload enforces normalized frames and max cap", () => {
   const payload = makePollPayload([
     { text: "Frame one", icon: "i1" },
     { text: "Frame two", icon: "broken" },
@@ -11,7 +11,7 @@ test("makePollPayload enforces 1-3 normalized frames", () => {
   ]);
 
   assert.equal(Array.isArray(payload.frames), true);
-  assert.equal(payload.frames.length, 3);
+  assert.equal(payload.frames.length, 4);
   assert.equal(payload.frames[0].icon, "i1");
   assert.equal(payload.frames[1].icon, "i43558");
 });

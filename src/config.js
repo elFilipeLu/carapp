@@ -2,6 +2,7 @@ const DEFAULT_TZ = "UTC";
 const CACHE_TTL_MS = 60_000;
 const REQUEST_TIMEOUT_MS = 8_000;
 const API_TOKEN = process.env.API_TOKEN || "";
+const POLL_TOKEN = process.env.POLL_TOKEN || "";
 const RATE_LIMIT_WINDOW_MS = Number(process.env.RATE_LIMIT_WINDOW_MS || 60_000);
 const RATE_LIMIT_MAX_REQUESTS = Number(process.env.RATE_LIMIT_MAX_REQUESTS || 120);
 const PREFERENCES_FILE =
@@ -39,6 +40,34 @@ const DEFAULT_ICAL_FEEDS = [
     url: "https://calendar.google.com/calendar/ical/61jccgg4rshh1temqk0dj4lens%40group.calendar.google.com/public/basic.ics",
     keyword: "le mans",
   },
+  {
+    series: "MOTOGP",
+    url: "https://calendar.google.com/calendar/ical/832vbii8pmrvma356b4vn3v42c%40group.calendar.google.com/public/basic.ics",
+  },
+  {
+    series: "WRC",
+    url: "https://calendar.google.com/calendar/ical/fei68gpe16c85ed3jjdtvrn8ns%40group.calendar.google.com/public/basic.ics",
+  },
+  {
+    series: "FORMULAE",
+    url: "https://calendar.google.com/calendar/ical/vno0ntshopq0nmob26db2pcen8%40group.calendar.google.com/public/basic.ics",
+  },
+  {
+    series: "INDYCAR",
+    url: "https://calendar.google.com/calendar/ical/hlskhf7l8ce7btind39bb9kf1o%40group.calendar.google.com/public/basic.ics",
+  },
+  {
+    series: "NASCAR",
+    url: "https://calendar.google.com/calendar/ical/db8c47ne2bt9qbld2mhdabm0u8%40group.calendar.google.com/public/basic.ics",
+  },
+  {
+    series: "F2",
+    url: "https://calendar.google.com/calendar/ical/rttoqh7u6m247f2ub6c05m4pe4%40group.calendar.google.com/public/basic.ics",
+  },
+  {
+    series: "F3",
+    url: "https://calendar.google.com/calendar/ical/sorhedtr7q5qmea6f0hvf20864%40group.calendar.google.com/public/basic.ics",
+  },
 ];
 
 const SESSION_PRIORITY = {
@@ -54,6 +83,7 @@ module.exports = {
   CACHE_TTL_MS,
   REQUEST_TIMEOUT_MS,
   API_TOKEN,
+  POLL_TOKEN,
   RATE_LIMIT_WINDOW_MS,
   RATE_LIMIT_MAX_REQUESTS,
   PREFERENCES_FILE,

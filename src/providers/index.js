@@ -20,6 +20,13 @@ async function fetchRawEvents() {
   const primaryEvents = [];
   if (openf1Events.status === "fulfilled") primaryEvents.push(...openf1Events.value);
   if (icalEvents.status === "fulfilled") primaryEvents.push(...icalEvents.value);
+  const activeSeries = Array.from(new Set(primaryEvents.map((event) => event.series))).sort();
+  const icalSeriesCounts = {};
+  if (icalEvents.status === "fulfilled") {
+    for (const event of icalEvents.value) {
+      icalSeriesCounts[event.series] = (icalSeriesCounts[event.series] || 0) + 1;
+    }
+  }
 
   lastStatus = {
     checked_at_utc: new Date().toISOString(),
@@ -31,11 +38,17 @@ async function fetchRawEvents() {
           : { ok: false, count: 0, error: openf1Events.reason?.message || "openf1_failed" },
       ical:
         icalEvents.status === "fulfilled"
-          ? { ok: true, count: icalEvents.value.length, error: null }
+          ? {
+              ok: true,
+              count: icalEvents.value.length,
+              error: null,
+              series_counts: icalSeriesCounts,
+            }
           : { ok: false, count: 0, error: icalEvents.reason?.message || "ical_failed" },
       mock: { ok: false, count: 0, error: null },
     },
     selected_source: "primary",
+    active_series: activeSeries,
   };
 
   if (primaryEvents.length > 0) return primaryEvents;
