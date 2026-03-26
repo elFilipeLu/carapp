@@ -57,6 +57,14 @@ app.use((req, res, next) => {
   next();
 });
 
+app.get("/", (_, res) => {
+  res.json({
+    ok: true,
+    service: "lametric-motorsport-api",
+    endpoints: ["/health", "/lametric", "/lametric/poll"],
+  });
+});
+
 function validateTz(tz) {
   return DateTime.now().setZone(tz).isValid;
 }

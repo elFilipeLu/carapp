@@ -1,6 +1,9 @@
 const { API_TOKEN } = require("../config");
 
+const PUBLIC_PATHS = new Set(["/", "/health"]);
+
 function authMiddleware(req, res, next) {
+  if (PUBLIC_PATHS.has(req.path)) return next();
   if (!API_TOKEN) return next();
 
   const bearer = req.header("authorization") || "";
