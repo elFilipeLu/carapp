@@ -1,0 +1,23 @@
+{
+  "type": "indicator",
+  "communication": "poll",
+  "name": "Motorsport Companion",
+  "description": "Live motorsport awareness for F1, WEC, IMSA, GT3 and Le Mans.",
+  "poll_url_template": "https://<your-public-domain>/lametric/poll?profile=<profile-id>",
+  "poll_frequency_seconds": 60,
+  "default_profile_payload": {
+    "series": ["F1", "WEC", "IMSA", "GT3", "LEMANS"],
+    "sessions": ["race", "qualifying"],
+    "favorites": ["VER"],
+    "tz": "Europe/Paris",
+    "nextOnly": true,
+    "multipleUpcoming": false,
+    "liveAlerts": true,
+    "results": true
+  },
+  "notes": [
+    "Use PUT /preferences/<profile-id> to store user preferences.",
+    "Use /lametric/poll for strict LaMetric frame payload.",
+    "Set API_TOKEN only if you also pass token in poll URL."
+  ]
+}

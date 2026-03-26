@@ -1,0 +1,22 @@
+{
+  "name": "lametricapp",
+  "version": "1.0.0",
+  "description": "LaMetric Motorsport Companion API",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node --watch src/server.js",
+    "test": "node --test"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "express": "^5.2.1",
+    "ioredis": "^5.10.1",
+    "luxon": "^3.7.2",
+    "node-ical": "^0.25.6",
+    "undici": "^7.24.6"
+  }
+}

@@ -1,0 +1,22 @@
+services:
+  - type: web
+    name: lametric-motorsport-api
+    env: docker
+    plan: starter
+    healthCheckPath: /health
+    autoDeploy: true
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: "3000"
+      - key: OPENF1_ENABLED
+        value: "true"
+      - key: ICAL_ENABLED
+        value: "true"
+      - key: MOCK_FALLBACK_ENABLED
+        value: "true"
+      - key: ENABLE_NOTIFICATIONS
+        value: "true"
+      - key: NOTIFICATION_POLL_INTERVAL_MS
+        value: "60000"
