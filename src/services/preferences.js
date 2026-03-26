@@ -1,7 +1,7 @@
 function splitCsv(value) {
   if (!value) return [];
   return String(value)
-    .split(",")
+    .split(/[,;|]/)
     .map((x) => x.trim())
     .filter(Boolean);
 }
@@ -37,17 +37,60 @@ function normalizeDisplayMode(value, fallback = "balanced") {
   return allowed.has(candidate) ? candidate : "balanced";
 }
 
+const PRESETS = {
+  fan1: {
+    series: ["F1", "WEC"],
+    sessions: ["race", "qualifying"],
+    favorites: ["VER"],
+    displayMode: "auto",
+    rotateSeries: true,
+  },
+  f1_only: {
+    series: ["F1"],
+    sessions: ["race", "qualifying"],
+    favorites: ["VER", "LEC"],
+    displayMode: "ultra",
+    rotateSeries: false,
+  },
+  endurance: {
+    series: ["WEC", "IMSA", "GT3", "LEMANS"],
+    sessions: ["race", "qualifying"],
+    favorites: [],
+    displayMode: "balanced",
+    rotateSeries: true,
+  },
+};
+
+function firstDefined(obj, keys) {
+  for (const key of keys) {
+    if (obj[key] !== undefined && obj[key] !== null && String(obj[key]).trim() !== "") {
+      return obj[key];
+    }
+  }
+  return undefined;
+}
+
 function parsePreferences(query, base = null) {
-  const basePrefs = base || {};
-  const series = query.series
-    ? normalizeSeries(splitCsv(query.series))
+  const presetKey = String(query.preset || "").toLowerCase();
+  const preset = PRESETS[presetKey] || {};
+  const basePrefs = { ...preset, ...(base || {}) };
+
+  const seriesInput = firstDefined(query, ["series", "championships", "championship"]);
+  const sessionsInput = firstDefined(query, ["sessions", "sessionTypes", "session_types"]);
+  const favoritesInput = firstDefined(query, ["favorites", "favorite", "favoriteDriver"]);
+  const favoriteTeamInput = firstDefined(query, ["favoriteTeam", "favorite_team"]);
+
+  const series = seriesInput
+    ? normalizeSeries(splitCsv(seriesInput))
     : normalizeSeries(basePrefs.series || []);
-  const sessions = query.sessions
-    ? normalizeSessions(splitCsv(query.sessions))
+  const sessions = sessionsInput
+    ? normalizeSessions(splitCsv(sessionsInput))
     : normalizeSessions(basePrefs.sessions || []);
-  const favorites = query.favorites
-    ? normalizeFavorites(splitCsv(query.favorites))
-    : normalizeFavorites(basePrefs.favorites || []);
+
+  const favorites = normalizeFavorites([
+    ...(favoritesInput ? splitCsv(favoritesInput) : basePrefs.favorites || []),
+    ...(favoriteTeamInput ? splitCsv(favoriteTeamInput) : []),
+  ]);
 
   return {
     series,
@@ -61,7 +104,10 @@ function parsePreferences(query, base = null) {
     ),
     liveAlerts: parseBoolean(query.liveAlerts, basePrefs.liveAlerts ?? true),
     results: parseBoolean(query.results, basePrefs.results ?? true),
-    displayMode: normalizeDisplayMode(query.displayMode, basePrefs.displayMode || "balanced"),
+    displayMode: normalizeDisplayMode(
+      firstDefined(query, ["displayMode", "mode"]),
+      basePrefs.displayMode || "balanced"
+    ),
     showSeriesLogo: parseBoolean(query.showSeriesLogo, basePrefs.showSeriesLogo ?? true),
     showSessionIcon: parseBoolean(query.showSessionIcon, basePrefs.showSessionIcon ?? false),
     liveBlink: parseBoolean(query.liveBlink, basePrefs.liveBlink ?? true),

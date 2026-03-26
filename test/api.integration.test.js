@@ -102,6 +102,19 @@ test("multi-series rotation returns one frame per selected series", async (t) =>
   assert.equal(payload.frames.length <= 3, true);
 });
 
+test("preset and alias parameters work for embedded lametric-only config", async (t) => {
+  const { server, baseUrl } = await startServer();
+  t.after(() => server.close());
+
+  const response = await fetch(
+    `${baseUrl}/lametric/poll?preset=endurance&championships=WEC;IMSA&sessionTypes=race,qualifying&mode=ultra&tz=Europe/Paris`
+  );
+  assert.equal(response.status, 200);
+  const payload = await response.json();
+  assert.equal(Array.isArray(payload.frames), true);
+  assert.equal(payload.frames.length >= 1, true);
+});
+
 test("selected profile series are strictly enforced", async (t) => {
   const { server, baseUrl } = await startServer();
   t.after(() => server.close());
