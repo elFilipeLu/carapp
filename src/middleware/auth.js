@@ -1,6 +1,6 @@
 const { API_TOKEN } = require("../config");
 
-const PUBLIC_PATHS = new Set(["/", "/health"]);
+const PUBLIC_PATHS = new Set(["/", "/health", "/privacy"]);
 
 function authMiddleware(req, res, next) {
   if (PUBLIC_PATHS.has(req.path)) return next();

@@ -65,6 +65,43 @@ app.get("/", (_, res) => {
   });
 });
 
+app.get("/privacy", (_, res) => {
+  res.type("html").send(`<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Motorsport Companion Privacy Policy</title>
+  <style>
+    body { font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, sans-serif; max-width: 760px; margin: 40px auto; padding: 0 16px; line-height: 1.5; }
+    h1, h2 { margin-top: 24px; }
+  </style>
+</head>
+<body>
+  <h1>Motorsport Companion Privacy Policy</h1>
+  <p>Last updated: ${new Date().toISOString().slice(0, 10)}</p>
+
+  <h2>What this app does</h2>
+  <p>Motorsport Companion provides motorsport schedule and status frames for LaMetric devices.</p>
+
+  <h2>Data collected</h2>
+  <p>This service stores only configuration data needed to run the app (for example: selected series, session preferences, timezone, and display options).</p>
+
+  <h2>Personal data</h2>
+  <p>This service does not intentionally collect sensitive personal data. No payment information is processed.</p>
+
+  <h2>Third-party sources</h2>
+  <p>This app consumes motorsport data from external providers (for example OpenF1 and public calendar feeds).</p>
+
+  <h2>Data sharing</h2>
+  <p>We do not sell personal data. Data may be processed by infrastructure providers required to host this service.</p>
+
+  <h2>Contact</h2>
+  <p>For privacy questions, contact the app publisher via LaMetric Store support/contact channels.</p>
+</body>
+</html>`);
+});
+
 function validateTz(tz) {
   return DateTime.now().setZone(tz).isValid;
 }
